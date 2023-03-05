@@ -22,6 +22,7 @@ public class ZNSTextAttachment: NSTextAttachment {
     
     private var isLoading: Bool = false
     private var textStorages: [WeakNSTextStorage] = []
+    private var urlSessionDataTask: URLSessionDataTask?
     
     public init(imageURL: URL, imageWidth: CGFloat? = nil, imageHeight: CGFloat? = nil, placeholderImage: NSImage? = nil, placeholderImageOrigin: CGPoint? = nil) {
         self.imageURL = imageURL
