@@ -11,7 +11,7 @@ import AppKit
 import UniformTypeIdentifiers
 
 public class ZNSTextAttachment: NSTextAttachment {
-
+    
     public let imageURL: URL
     public weak var delegate: ZNSTextAttachmentDelegate?
     public weak var dataSource: ZNSTextAttachmentDataSource?
@@ -47,7 +47,7 @@ public class ZNSTextAttachment: NSTextAttachment {
     }
     
     public override func image(forBounds imageBounds: CGRect, textContainer: NSTextContainer?, characterIndex charIndex: Int) -> NSImage? {
-
+        
         if let textStorage = textContainer?.layoutManager?.textStorage {
             appendToTextStorages(with: textStorage)
         }
@@ -55,37 +55,25 @@ public class ZNSTextAttachment: NSTextAttachment {
         guard !isLoading else { return image }
         isLoading = true
         
-        dataSource?.zNSTextAttachment(self, loadImageURL: imageURL, completion: { data in
-            let fileType: String
-            let pathExtension = self.imageURL.pathExtension
-            if #available(macOS 11.0, *) {
-                if let utType = UTType(filenameExtension: pathExtension) {
-                    fileType = utType.identifier
-                } else {
-                    fileType = pathExtension
+        if let dataSource = self.dataSource {
+            dataSource.zNSTextAttachment(self, loadImageURL: imageURL, completion: { data in
+                self.dataDownloaded(data)
+                self.isLoading = false
+            })
+        } else {
+            let urlSessionDataTask = URLSession.shared.dataTask(with: imageURL) { (data, response, error) in
+                guard let data = data, error == nil else {
+                    print(error?.localizedDescription as Any)
+                    return
                 }
-            } else {
-                if let utType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil) {
-                    fileType = utType.takeRetainedValue() as String
-                } else {
-                    fileType = pathExtension
-                }
+                
+                self.dataDownloaded(data)
+                self.isLoading = false
+                self.urlSessionDataTask = nil
             }
-            
-            let image = NSImage(data: data)
-
-            DispatchQueue.main.async {
-                self.textStorages.forEach { value in
-                    value.rangesForAttachment(attachment: self)?.forEach({ range in
-                        value.textStorage?.deleteCharacters(in: range)
-                        value.textStorage?.insert(NSAttributedString(attachment: ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)), at: range.location)
-                    })
-                }
-                self.delegate?.zNSTextAttachment(didLoad: self)
-            }
-
-            self.isLoading = false
-        })
+            self.urlSessionDataTask = urlSessionDataTask
+            urlSessionDataTask.resume()
+        }
         
         if let image = self.image {
             return image
@@ -93,7 +81,7 @@ public class ZNSTextAttachment: NSTextAttachment {
         
         return nil
     }
-
+    
     
     public override func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
         
@@ -102,6 +90,36 @@ public class ZNSTextAttachment: NSTextAttachment {
         }
         
         return .zero
+    }
+    
+    func dataDownloaded(_ data: Data) {
+        let fileType: String
+        let pathExtension = self.imageURL.pathExtension
+        if #available(macOS 11.0, *) {
+            if let utType = UTType(filenameExtension: pathExtension) {
+                fileType = utType.identifier
+            } else {
+                fileType = pathExtension
+            }
+        } else {
+            if let utType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil) {
+                fileType = utType.takeRetainedValue() as String
+            } else {
+                fileType = pathExtension
+            }
+        }
+        
+        let image = NSImage(data: data)
+        
+        DispatchQueue.main.async {
+            self.textStorages.forEach { value in
+                value.rangesForAttachment(attachment: self)?.forEach({ range in
+                    value.textStorage?.deleteCharacters(in: range)
+                    value.textStorage?.insert(NSAttributedString(attachment: ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)), at: range.location)
+                })
+            }
+            self.delegate?.zNSTextAttachment(didLoad: self)
+        }
     }
 }
 

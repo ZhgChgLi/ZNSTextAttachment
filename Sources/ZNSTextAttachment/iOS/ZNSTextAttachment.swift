@@ -25,6 +25,7 @@ public class ZNSTextAttachment: NSTextAttachment {
     private var isLoading: Bool = false
     private var textStorages: [WeakNSTextStorage] = []
     private var labels: [WeakUILabel] = []
+    private var urlSessionDataTask: URLSessionDataTask?
     
     public init(imageURL: URL, imageWidth: CGFloat? = nil, imageHeight: CGFloat? = nil, placeholderImage: UIImage? = nil, placeholderImageOrigin: CGPoint? = nil) {
         self.imageURL = imageURL
@@ -62,45 +63,25 @@ public class ZNSTextAttachment: NSTextAttachment {
         guard !isLoading else { return image }
         isLoading = true
         
-        dataSource?.zNSTextAttachment(self, loadImageURL: imageURL, completion: { data in
-            let fileType: String
-            let pathExtension = self.imageURL.pathExtension
-            if #available(iOS 14.0, *) {
-                if let utType = UTType(filenameExtension: pathExtension) {
-                    fileType = utType.identifier
-                } else {
-                    fileType = pathExtension
+        if let dataSource = self.dataSource {
+            dataSource.zNSTextAttachment(self, loadImageURL: imageURL, completion: { data in
+                self.dataDownloaded(data)
+                self.isLoading = false
+            })
+        } else {
+            let urlSessionDataTask = URLSession.shared.dataTask(with: imageURL) { (data, response, error) in
+                guard let data = data, error == nil else {
+                    print(error?.localizedDescription as Any)
+                    return
                 }
-            } else {
-                if let utType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil) {
-                    fileType = utType.takeRetainedValue() as String
-                } else {
-                    fileType = pathExtension
-                }
+                
+                self.dataDownloaded(data)
+                self.isLoading = false
+                self.urlSessionDataTask = nil
             }
-            
-            let image = UIImage(data: data)
-
-            DispatchQueue.main.async {
-                self.textStorages.forEach { value in
-                    value.rangesForAttachment(attachment: self)?.forEach({ range in
-                        value.textStorage?.deleteCharacters(in: range)
-                        value.textStorage?.insert(NSAttributedString(attachment: ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)), at: range.location)
-                    })
-                }
-                self.labels.forEach { value in
-                    value.rangesForAttachment(attachment: self)?.forEach({ range in
-                        let attributedText = NSMutableAttributedString(attributedString: value.label?.attributedText ?? NSAttributedString())
-                        attributedText.deleteCharacters(in: range)
-                        attributedText.insert(NSAttributedString(attachment: ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)), at: range.location)
-                        value.label?.attributedText = attributedText
-                    })
-                }
-                self.delegate?.zNSTextAttachment(didLoad: self)
-            }
-
-            self.isLoading = false
-        })
+            self.urlSessionDataTask = urlSessionDataTask
+            urlSessionDataTask.resume()
+        }
         
         if let image = self.image {
             return image
@@ -109,7 +90,6 @@ public class ZNSTextAttachment: NSTextAttachment {
         return nil
     }
 
-    
     public override func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
         
         if let image = self.image {
@@ -117,6 +97,44 @@ public class ZNSTextAttachment: NSTextAttachment {
         }
         
         return .zero
+    }
+    
+    func dataDownloaded(_ data: Data) {
+        let fileType: String
+        let pathExtension = self.imageURL.pathExtension
+        if #available(iOS 14.0, *) {
+            if let utType = UTType(filenameExtension: pathExtension) {
+                fileType = utType.identifier
+            } else {
+                fileType = pathExtension
+            }
+        } else {
+            if let utType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil) {
+                fileType = utType.takeRetainedValue() as String
+            } else {
+                fileType = pathExtension
+            }
+        }
+        
+        let image = UIImage(data: data)
+
+        DispatchQueue.main.async {
+            self.textStorages.forEach { value in
+                value.rangesForAttachment(attachment: self)?.forEach({ range in
+                    value.textStorage?.deleteCharacters(in: range)
+                    value.textStorage?.insert(NSAttributedString(attachment: ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)), at: range.location)
+                })
+            }
+            self.labels.forEach { value in
+                value.rangesForAttachment(attachment: self)?.forEach({ range in
+                    let attributedText = NSMutableAttributedString(attributedString: value.label?.attributedText ?? NSAttributedString())
+                    attributedText.deleteCharacters(in: range)
+                    attributedText.insert(NSAttributedString(attachment: ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)), at: range.location)
+                    value.label?.attributedText = attributedText
+                })
+            }
+            self.delegate?.zNSTextAttachment(didLoad: self)
+        }
     }
 }
 
