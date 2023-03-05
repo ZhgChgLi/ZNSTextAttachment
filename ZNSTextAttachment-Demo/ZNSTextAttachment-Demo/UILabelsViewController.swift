@@ -19,7 +19,7 @@ class UILabelsViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        let attachment = ZNSTextAttachmentPlaceholder(imageURL: URL(string: "https://zhgchg.li/assets/a5643de271e4/1*A0yXupXW9-F9ZWe4gp2ObA.jpeg")!, placeholderImage: UIImage(systemName: "viewfinder.circle.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal))
+        let attachment = ZNSTextAttachment(imageURL: URL(string: "https://zhgchg.li/assets/a5643de271e4/1*A0yXupXW9-F9ZWe4gp2ObA.jpeg")!, placeholderImage: UIImage(systemName: "viewfinder.circle.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal))
         
         let data = TestData.generate(with: attachment)
         
@@ -35,7 +35,7 @@ class UILabelsViewController: UIViewController {
 }
 
 extension UILabelsViewController: ZNSTextAttachmentDataSource {
-    func zNSTextAttachment(_ textAttachment: ZNSTextAttachmentPlaceholder, loadImageURL imageURL: URL, completion: @escaping (Data) -> Void) {
+    func zNSTextAttachment(_ textAttachment: ZNSTextAttachment, loadImageURL imageURL: URL, completion: @escaping (Data) -> Void) {
         let dataTask = URLSession.shared.dataTask(with: URL(string: imageURL.absoluteString+"?q=\(UUID().uuidString)")!) { (data, response, error) in
             
             guard let data = data, error == nil else {
@@ -53,7 +53,7 @@ extension UILabelsViewController: ZNSTextAttachmentDataSource {
 
 
 extension UILabelsViewController: ZNSTextAttachmentDelegate {
-    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachmentPlaceholder) {
+    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment) {
         //
     }
 }

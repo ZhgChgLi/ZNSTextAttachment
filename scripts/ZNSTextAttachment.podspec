@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = "ZNSTextAttachment"
-  s.version          = "1.0.0"
-  s.summary          = "ZNSTextAttachment enables NSTextAttachment to download images from remote URLs, and supports both UITextView and UILabel for multiple attachments."
+  s.version          = "1.0.1"
+  s.summary          = "ZNSTextAttachment enables NSTextAttachment to download images from remote URLs."
   s.homepage         = "https://github.com/ZhgChgLi/ZNSTextAttachment"
   s.license          = { :type => "MIT", :file => "LICENSE" }
   s.author           = { "ZhgChgLi" => "me@zhgchg.li" }
