@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 extension UILabel: ZNSTextAttachmentable {
-    func replace(attachment: ZNSTextAttachment, to: ZResizableNSTextAttachment) {
+    public func replace(attachment: ZNSTextAttachment, to: ZResizableNSTextAttachment) {
         guard let attributedString = attributedText else {
             return
         }
