@@ -25,6 +25,8 @@ public class ZResizableNSTextAttachment: NSTextAttachment {
         self.fixedHeight = fixedHeight
         
         super.init(data: data, ofType: type)
+        
+        self.attachmentCell = NSTextAttachmentCell.init(imageCell: NSImage(data: data))
     }
     
     required init?(coder: NSCoder) {
