@@ -26,8 +26,8 @@ class UILabelsViewController: UIViewController {
         attachment.dataSource = self
         attachment.delegate = self
         
-        attachment.register(label: label1)
-        attachment.register(label: label2)
+        attachment.register(label1)
+        attachment.register(label2)
         
         label1.attributedText = data
         label2.attributedText = data

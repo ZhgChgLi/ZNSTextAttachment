@@ -17,7 +17,7 @@ public class ZNSTextAttachmentLabel: UILabel {
                     return
                 }
                 
-                attachment.register(label: self)
+                attachment.register(self)
             }
         }
     }
