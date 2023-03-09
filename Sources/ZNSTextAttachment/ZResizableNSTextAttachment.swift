@@ -26,7 +26,9 @@ public class ZResizableNSTextAttachment: NSTextAttachment {
         
         super.init(data: data, ofType: type)
         
-        self.attachmentCell = NSTextAttachmentCell.init(imageCell: NSImage(data: data))
+        #if canImport(AppKit)
+            self.attachmentCell = NSTextAttachmentCell.init(imageCell: NSImage(data: data))
+        #endif
     }
     
     required init?(coder: NSCoder) {
