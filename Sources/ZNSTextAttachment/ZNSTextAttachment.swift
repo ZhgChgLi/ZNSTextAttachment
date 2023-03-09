@@ -140,11 +140,11 @@ public class ZNSTextAttachment: NSTextAttachment {
         #endif
 
         DispatchQueue.main.async {
+            let loaded = ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)
             self.sources.forEach { source in
-                let loaded = ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)
                 source.value?.replace(attachment: self, to: loaded)
             }
-            self.delegate?.zNSTextAttachment(didLoad: self)
+            self.delegate?.zNSTextAttachment(didLoad: self, to: loaded)
         }
     }
 }

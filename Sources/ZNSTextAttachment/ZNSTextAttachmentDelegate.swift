@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol ZNSTextAttachmentDelegate: AnyObject {
-    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment)
+    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment, to: ZResizableNSTextAttachment)
 }
