@@ -70,3 +70,25 @@ label.attributedText = attributedString
 <img width="1450" alt="image" src="https://user-images.githubusercontent.com/33706588/224502652-d2448b48-d15c-4bcb-b6f1-9cdee839c99b.png">
 
 Post: [手工打造 HTML 解析器的那些事(Traditional Chinese)](https://medium.com/zrealm-ios-dev/%E6%89%8B%E5%B7%A5%E6%89%93%E9%80%A0-html-%E8%A7%A3%E6%9E%90%E5%99%A8%E7%9A%84%E9%82%A3%E4%BA%9B%E4%BA%8B-2724f02f6e7)
+
+## About
+- [ZhgChg.Li](https://zhgchg.li/)
+- [ZhgChgLi's Medium](https://blog.zhgchg.li/)
+
+## Other works
+### Swift Libraries
+- [ZMarkupParser](https://github.com/ZhgChgLi/ZMarkupParser) is a pure-Swift library that helps you to convert HTML strings to NSAttributedString with customized style and tags.
+- [ZPlayerCacher](https://github.com/ZhgChgLi/ZPlayerCacher) is a lightweight implementation of the AVAssetResourceLoaderDelegate protocol that enables AVPlayerItem to support caching streaming files.
+- [ZNSTextAttachment](https://github.com/ZhgChgLi/ZNSTextAttachment) enables NSTextAttachment to download images from remote URLs, support both UITextView and UILabel.
+
+### Integration Tools
+- [ZReviewTender](https://github.com/ZhgChgLi/ZReviewTender) is a tool for fetching app reviews from the App Store and Google Play Console and integrating them into your workflow.
+- [ZMediumToMarkdown](https://github.com/ZhgChgLi/ZMediumToMarkdown) is a powerful tool that allows you to effortlessly download and convert your Medium posts to Markdown format.
+
+# Donate
+
+[![Buy Me A Coffe](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20beer!&emoji=%F0%9F%8D%BA&slug=zhgchgli&button_colour=FFDD00&font_colour=000000&font_family=Bree&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/zhgchgli)
+
+If you find this library helpful, please consider starring the repo or recommending it to your friends.
+
+Feel free to open an issue or submit a fix/contribution via pull request. :)
