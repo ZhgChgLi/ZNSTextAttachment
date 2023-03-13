@@ -53,7 +53,7 @@ extension UILabelsViewController: ZNSTextAttachmentDataSource {
 
 
 extension UILabelsViewController: ZNSTextAttachmentDelegate {
-    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment) {
+    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment, to: ZResizableNSTextAttachment) {
         //
     }
 }

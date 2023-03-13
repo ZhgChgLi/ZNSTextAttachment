@@ -48,7 +48,7 @@ extension MixedViewController: ZNSTextAttachmentDataSource {
 
 
 extension MixedViewController: ZNSTextAttachmentDelegate {
-    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment) {
+    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment, to: ZResizableNSTextAttachment) {
         //
     }
 }

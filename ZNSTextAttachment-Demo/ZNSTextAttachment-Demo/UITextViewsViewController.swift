@@ -52,7 +52,7 @@ extension UITextViewsViewController: ZNSTextAttachmentDataSource {
 
 
 extension UITextViewsViewController: ZNSTextAttachmentDelegate {
-    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment) {
-        
+    func zNSTextAttachment(didLoad textAttachment: ZNSTextAttachment, to: ZResizableNSTextAttachment) {
+        //
     }
 }
