@@ -74,8 +74,8 @@ public class ZNSTextAttachment: NSTextAttachment {
         isLoading = true
         
         if let dataSource = self.dataSource {
-            dataSource.zNSTextAttachment(self, loadImageURL: imageURL, completion: { data in
-                self.dataDownloaded(data)
+            dataSource.zNSTextAttachment(self, loadImageURL: imageURL, completion: { data, mimeType  in
+                self.dataDownloaded(data, mimeType: mimeType)
                 self.isLoading = false
             })
         } else {
@@ -85,7 +85,8 @@ public class ZNSTextAttachment: NSTextAttachment {
                     return
                 }
                 
-                self.dataDownloaded(data)
+                
+                self.dataDownloaded(data, mimeType: response?.mimeType)
                 self.isLoading = false
                 self.urlSessionDataTask = nil
             }
@@ -103,37 +104,44 @@ public class ZNSTextAttachment: NSTextAttachment {
         return .zero
     }
     
-    func dataDownloaded(_ data: Data) {
+    func dataDownloaded(_ data: Data, mimeType: String?) {
         let fileType: String
         let pathExtension = self.imageURL.pathExtension
-        
         #if canImport(UIKit)
         if #available(iOS 14.0, *) {
-            if let utType = UTType(filenameExtension: pathExtension) {
+            if let mimeType = mimeType, let utType = UTType(mimeType: mimeType) {
+                fileType = utType.identifier
+            } else if let utType = UTType(filenameExtension: pathExtension) {
                 fileType = utType.identifier
             } else {
-                fileType = pathExtension
+                fileType = "public.\(pathExtension)"
             }
         } else {
-            if let utType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil) {
-                fileType = utType.takeRetainedValue() as String
+            if let mimeType = mimeType, let utTypeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue() as? String {
+                fileType = utTypeIdentifier
+            } else if let utTypeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil)?.takeRetainedValue() as? String {
+                fileType = utTypeIdentifier
             } else {
-                fileType = pathExtension
+                fileType = "public.\(pathExtension)"
             }
         }
         let image = UIImage(data: data)
         #elseif canImport(AppKit)
         if #available(macOS 11.0, *) {
-            if let utType = UTType(filenameExtension: pathExtension) {
+            if let mimeType = mimeType, let utType = UTType(mimeType: mimeType) {
+                fileType = utType.identifier
+            } else if let utType = UTType(filenameExtension: pathExtension) {
                 fileType = utType.identifier
             } else {
-                fileType = pathExtension
+                fileType = "public.\(pathExtension)"
             }
         } else {
-            if let utType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil) {
-                fileType = utType.takeRetainedValue() as String
+            if let mimeType = mimeType, let utTypeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue() as? String {
+                fileType = utTypeIdentifier
+            } else if let utTypeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil)?.takeRetainedValue() as? String {
+                fileType = utTypeIdentifier
             } else {
-                fileType = pathExtension
+                fileType = "public.\(pathExtension)"
             }
         }
         let image = NSImage(data: data)

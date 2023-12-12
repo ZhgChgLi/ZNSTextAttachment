@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+public typealias ZNSTextAttachmentDownloadedDataMIMEType = String
 public protocol ZNSTextAttachmentDataSource: AnyObject {
-    func zNSTextAttachment(_ textAttachment: ZNSTextAttachment, loadImageURL imageURL: URL, completion: @escaping (Data) -> Void)
+    func zNSTextAttachment(_ textAttachment: ZNSTextAttachment, loadImageURL imageURL: URL, completion: @escaping (Data, ZNSTextAttachmentDownloadedDataMIMEType?) -> Void)
 }
