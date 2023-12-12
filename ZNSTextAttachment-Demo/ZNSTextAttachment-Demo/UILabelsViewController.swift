@@ -35,7 +35,7 @@ class UILabelsViewController: UIViewController {
 }
 
 extension UILabelsViewController: ZNSTextAttachmentDataSource {
-    func zNSTextAttachment(_ textAttachment: ZNSTextAttachment, loadImageURL imageURL: URL, completion: @escaping (Data) -> Void) {
+    func zNSTextAttachment(_ textAttachment: ZNSTextAttachment, loadImageURL imageURL: URL, completion: @escaping (Data, ZNSTextAttachmentDownloadedDataMIMEType?) -> Void) {
         let dataTask = URLSession.shared.dataTask(with: URL(string: imageURL.absoluteString+"?q=\(UUID().uuidString)")!) { (data, response, error) in
             
             guard let data = data, error == nil else {
@@ -43,7 +43,7 @@ extension UILabelsViewController: ZNSTextAttachmentDataSource {
                 return
             }
             
-            completion(data)
+            completion(data, response?.mimeType)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             dataTask.resume()

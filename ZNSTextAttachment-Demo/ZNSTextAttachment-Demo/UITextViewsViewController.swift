@@ -20,7 +20,7 @@ class UITextViewsViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        let attachment = ZNSTextAttachment(imageURL: URL(string: "https://zhgchg.li/assets/a5643de271e4/1*A0yXupXW9-F9ZWe4gp2ObA.jpeg")!, placeholderImage: UIImage(systemName: "viewfinder.circle.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal))
+        let attachment = ZNSTextAttachment(imageURL: URL(string: "https://cdn.sspai.com/editor/u_/clp6gmdb34tb3fodr3a0?imageView2/2/w/1120/q/90/interlace/1/ignore-error/1")!, placeholderImage: UIImage(systemName: "viewfinder.circle.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal))
         
         let data = TestData.generate(with: attachment)
         
@@ -34,15 +34,15 @@ class UITextViewsViewController: UIViewController {
 }
 
 extension UITextViewsViewController: ZNSTextAttachmentDataSource {
-    func zNSTextAttachment(_ textAttachment: ZNSTextAttachment, loadImageURL imageURL: URL, completion: @escaping (Data) -> Void) {
-        let dataTask = URLSession.shared.dataTask(with: URL(string: imageURL.absoluteString+"?q=\(UUID().uuidString)")!) { (data, response, error) in
+    func zNSTextAttachment(_ textAttachment: ZNSTextAttachment, loadImageURL imageURL: URL, completion: @escaping (Data, ZNSTextAttachmentDownloadedDataMIMEType?) -> Void) {
+        let dataTask = URLSession.shared.dataTask(with: URL(string: imageURL.absoluteString)!) { (data, response, error) in
             
             guard let data = data, error == nil else {
                 print(error?.localizedDescription as Any)
                 return
             }
             
-            completion(data)
+            completion(data, response?.mimeType)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             dataTask.resume()
