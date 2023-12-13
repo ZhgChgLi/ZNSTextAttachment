@@ -10,13 +10,13 @@ ZNSTextAttachment enables NSTextAttachment to download images from remote URLs, 
 ```
 File > Swift Packages > Add Package Dependency
 Add https://github.com/ZhgChgLi/ZNSTextAttachment.git
-Select "Up to Next Major" with "1.1.6"
+Select "Up to Next Major" with "1.1.7"
 ```
 or
 ```swift
 ...
 dependencies: [
-  .package(url: "https://github.com/ZhgChgLi/ZNSTextAttachment.git", from: "1.1.6"),
+  .package(url: "https://github.com/ZhgChgLi/ZNSTextAttachment.git", from: "1.1.7"),
 ]
 ...
 .target(
@@ -35,7 +35,7 @@ platform :ios, '12.0'
 use_frameworks!
 
 target 'MyApp' do
-  pod 'ZNSTextAttachment', '~> 1.1.6'
+  pod 'ZNSTextAttachment', '~> 1.1.7'
 end
 ```
 
