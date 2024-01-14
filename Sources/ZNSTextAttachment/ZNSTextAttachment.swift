@@ -84,12 +84,12 @@ public class ZNSTextAttachment: NSTextAttachment {
                 let firstMatch = regex.firstMatch(in: imageURL.absoluteString, options: [], range: NSRange(location: 0, length: imageURL.absoluteString.count)),
                firstMatch.range(at: 1).location != NSNotFound,
                firstMatch.range(at: 2).location != NSNotFound,
-               let mimeTypeRange = Range(firstMatch.range(at: 1), in: imageURL.absoluteString),
+               let typeRange = Range(firstMatch.range(at: 1), in: imageURL.absoluteString),
                let base64StringRange = Range(firstMatch.range(at: 2), in: imageURL.absoluteString),
                let base64Data = Data(base64Encoded: String(imageURL.absoluteString[base64StringRange]), options: .ignoreUnknownCharacters) {
                 
-                let mimeType = String(imageURL.absoluteString[mimeTypeRange])
-                self.dataDownloaded(base64Data, mimeType: mimeType)
+                let type = String(imageURL.absoluteString[typeRange])
+                self.dataDownloaded(base64Data, mimeType: "image/"+type)
                 
             } else {
                 let urlSessionDataTask = URLSession.shared.dataTask(with: imageURL) { (data, response, error) in
