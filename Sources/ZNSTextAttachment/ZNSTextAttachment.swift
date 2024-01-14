@@ -79,19 +79,33 @@ public class ZNSTextAttachment: NSTextAttachment {
                 self.isLoading = false
             })
         } else {
-            let urlSessionDataTask = URLSession.shared.dataTask(with: imageURL) { (data, response, error) in
-                guard let data = data, error == nil else {
-                    print(error?.localizedDescription as Any)
-                    return
+            
+            if let regex = try? NSRegularExpression(pattern: #"^data:image/(jpeg|jpg|png);base64,\s*(([A-Za-z0-9+/]*={0,2})+)$"#),
+                let firstMatch = regex.firstMatch(in: imageURL.absoluteString, options: [], range: NSRange(location: 0, length: imageURL.absoluteString.count)),
+               firstMatch.range(at: 1).location != NSNotFound,
+               firstMatch.range(at: 2).location != NSNotFound,
+               let mimeTypeRange = Range(firstMatch.range(at: 1), in: imageURL.absoluteString),
+               let base64StringRange = Range(firstMatch.range(at: 2), in: imageURL.absoluteString),
+               let base64Data = Data(base64Encoded: String(imageURL.absoluteString[base64StringRange]), options: .ignoreUnknownCharacters) {
+                
+                let mimeType = String(imageURL.absoluteString[mimeTypeRange])
+                self.dataDownloaded(base64Data, mimeType: mimeType)
+                
+            } else {
+                let urlSessionDataTask = URLSession.shared.dataTask(with: imageURL) { (data, response, error) in
+                    guard let data = data, error == nil else {
+                        print(error?.localizedDescription as Any)
+                        return
+                    }
+                    
+                    
+                    self.dataDownloaded(data, mimeType: response?.mimeType)
+                    self.isLoading = false
+                    self.urlSessionDataTask = nil
                 }
-                
-                
-                self.dataDownloaded(data, mimeType: response?.mimeType)
-                self.isLoading = false
-                self.urlSessionDataTask = nil
+                self.urlSessionDataTask = urlSessionDataTask
+                urlSessionDataTask.resume()
             }
-            self.urlSessionDataTask = urlSessionDataTask
-            urlSessionDataTask.resume()
         }
     }
     
