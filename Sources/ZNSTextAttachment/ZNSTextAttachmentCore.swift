@@ -1,4 +1,3 @@
-
 //
 //  ZNSTextAttachmentLabel.swift
 //
@@ -6,16 +5,12 @@
 //  Created by https://zhgchg.li on 2023/3/5.
 //
 
-#if canImport(UIKit)
 import UIKit
 import MobileCoreServices
-#elseif canImport(AppKit)
-import AppKit
-#endif
 
 import UniformTypeIdentifiers
 
-public class ZNSTextAttachment: NSTextAttachment {
+public class ZNSTextAttachmentCore: NSTextAttachment {
 
     public let imageURL: URL
     public weak var delegate: ZNSTextAttachmentDelegate?
@@ -29,7 +24,6 @@ public class ZNSTextAttachment: NSTextAttachment {
     private var sources: [WeakZNSTextAttachmentable] = []
     private var urlSessionDataTask: URLSessionDataTask?
     
-    #if canImport(UIKit)
     public init(imageURL: URL, imageWidth: CGFloat? = nil, imageHeight: CGFloat? = nil, placeholderImage: UIImage? = nil, placeholderImageOrigin: CGPoint? = nil) {
         self.imageURL = imageURL
         self.imageWidth = imageWidth
@@ -44,22 +38,6 @@ public class ZNSTextAttachment: NSTextAttachment {
         
         self.image = placeholderImage
     }
-    #elseif canImport(AppKit)
-    public init(imageURL: URL, imageWidth: CGFloat? = nil, imageHeight: CGFloat? = nil, placeholderImage: NSImage? = nil, placeholderImageOrigin: CGPoint? = nil) {
-        self.imageURL = imageURL
-        self.imageWidth = imageWidth
-        self.imageHeight = imageHeight
-        self.origin = placeholderImageOrigin
-        
-        if let placeholderImageData = placeholderImage?.tiffRepresentation {
-            super.init(data: placeholderImageData, ofType: "public.png")
-        } else {
-            super.init(data: nil, ofType: nil)
-        }
-        
-        self.image = placeholderImage
-    }
-    #endif
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -69,7 +47,7 @@ public class ZNSTextAttachment: NSTextAttachment {
         self.sources.append(WeakZNSTextAttachmentable(source))
     }
     
-    public func startDownlaod() {
+    public func startDownload() {
         guard !isLoading else { return }
         isLoading = true
         
@@ -118,10 +96,9 @@ public class ZNSTextAttachment: NSTextAttachment {
         return .zero
     }
     
-    func dataDownloaded(_ data: Data, mimeType: String?) {
+    public func dataDownloaded(_ data: Data, mimeType: String?) {
         let fileType: String
         let pathExtension = self.imageURL.pathExtension
-        #if canImport(UIKit)
         if #available(iOS 14.0, *) {
             if let mimeType = mimeType, let utType = UTType(mimeType: mimeType) {
                 fileType = utType.identifier
@@ -140,27 +117,6 @@ public class ZNSTextAttachment: NSTextAttachment {
             }
         }
         let image = UIImage(data: data)
-        #elseif canImport(AppKit)
-        if #available(macOS 11.0, *) {
-            if let mimeType = mimeType, let utType = UTType(mimeType: mimeType) {
-                fileType = utType.identifier
-            } else if let utType = UTType(filenameExtension: pathExtension) {
-                fileType = utType.identifier
-            } else {
-                fileType = "public.\(pathExtension)"
-            }
-        } else {
-            if let mimeType = mimeType, let utTypeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue() as? String {
-                fileType = utTypeIdentifier
-            } else if let utTypeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as CFString, nil)?.takeRetainedValue() as? String {
-                fileType = utTypeIdentifier
-            } else {
-                fileType = "public.\(pathExtension)"
-            }
-        }
-        let image = NSImage(data: data)
-        #endif
-
         DispatchQueue.main.async {
             let loaded = ZResizableNSTextAttachment(imageSize: image?.size, fixedWidth: self.imageWidth, fixedHeight: self.imageHeight, data: data, type: fileType)
             self.sources.forEach { source in
@@ -171,15 +127,14 @@ public class ZNSTextAttachment: NSTextAttachment {
     }
 }
 
-#if canImport(UIKit)
-extension ZNSTextAttachment {
-    public override func image(forBounds imageBounds: CGRect, textContainer: NSTextContainer?, characterIndex charIndex: Int) -> UIImage? {
+public extension ZNSTextAttachmentCore {
+    override func image(forBounds imageBounds: CGRect, textContainer: NSTextContainer?, characterIndex charIndex: Int) -> UIImage? {
 
         if let textStorage = textContainer?.layoutManager?.textStorage {
             register(textStorage)
         }
         
-        startDownlaod()
+        startDownload()
         
         if let image = self.image {
             return image
@@ -188,22 +143,3 @@ extension ZNSTextAttachment {
         return nil
     }
 }
-#elseif canImport(AppKit)
-extension ZNSTextAttachment {
-    public override func image(forBounds imageBounds: CGRect, textContainer: NSTextContainer?, characterIndex charIndex: Int) -> NSImage? {
-
-        if let textStorage = textContainer?.layoutManager?.textStorage {
-            register(textStorage)
-        }
-        
-        startDownlaod()
-        
-        if let image = self.image {
-            return image
-        }
-        
-        return nil
-    }
-}
-
-#endif

@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol ZNSTextAttachmentable: AnyObject {
-    func replace(attachment: ZNSTextAttachment, to: ZResizableNSTextAttachment)
+    func replace(attachment: ZNSTextAttachmentCore, to: ZResizableNSTextAttachment)
 }

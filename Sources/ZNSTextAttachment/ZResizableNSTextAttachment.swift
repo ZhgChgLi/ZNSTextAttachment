@@ -7,17 +7,14 @@
 
 import Foundation
 
-#if canImport(UIKit)
 import UIKit
-#elseif canImport(AppKit)
-import AppKit
-#endif
 
+@objc
 public class ZResizableNSTextAttachment: NSTextAttachment {
     
-    public let imageSize: CGSize?
-    public let fixedWidth: CGFloat?
-    public let fixedHeight: CGFloat?
+    public final let imageSize: CGSize?
+    public final let fixedWidth: CGFloat?
+    public final let fixedHeight: CGFloat?
     
     public init(imageSize: CGSize?, fixedWidth: CGFloat?, fixedHeight: CGFloat?, data: Data, type: String) {
         self.imageSize = imageSize
@@ -27,11 +24,11 @@ public class ZResizableNSTextAttachment: NSTextAttachment {
         super.init(data: data, ofType: type)
     }
     
-    required init?(coder: NSCoder) {
+    @objc required dynamic public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
+    @objc override dynamic public func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
         
         if let fixedWidth = self.fixedWidth,
            let fixedHeight = self.fixedHeight {
@@ -55,5 +52,9 @@ public class ZResizableNSTextAttachment: NSTextAttachment {
             
             return CGRect(origin: .zero, size:CGSize(width: Int(imageWidth * factor), height: Int(imageHeight * factor)))
         }
+    }
+    
+    @objc deinit {
+        print("ZResizableNSTextAttachment deinit")
     }
 }
