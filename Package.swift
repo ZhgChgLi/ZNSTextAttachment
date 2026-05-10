@@ -14,5 +14,8 @@ let package = Package(
     targets: [
         .target(name: "ZNSTextAttachment",
                 path: "Sources"),
+        .testTarget(name: "ZNSTextAttachmentTests",
+                    dependencies: ["ZNSTextAttachment"],
+                    path: "Tests/ZNSTextAttachmentTests"),
     ]
 )
